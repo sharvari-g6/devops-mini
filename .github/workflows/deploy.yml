@@ -13,25 +13,29 @@ jobs:
       uses: actions/checkout@v3
 
     # ---------------------------
-    # 1️⃣ DEPLOY USING SSH
+    # 1️⃣ SETUP SSH FOR DEPLOYMENT
     # ---------------------------
     - name: Install SSH key
       uses: webfactory/ssh-agent@v0.7.0
       with:
         ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+    # ---------------------------
+    # 2️⃣ COPY FILES TO VM
+    # ---------------------------
     - name: Copy project files to VM
       run: |
-        ssh -o StrictHostKeyChecking=no sharvariguptessd@34.100.135.127 "rm -rf devops-app"
-        scp -o StrictHostKeyChecking=no -r . sharvariguptessd@34.100.135.127:/home/sharvariguptessd/devops-app
+        ssh -o StrictHostKeyChecking=no sharvariguptessd@35.222.138.153 "rm -rf devops-app"
+        scp -o StrictHostKeyChecking=no -r . sharvariguptessd@35.222.138.153:/home/sharvariguptessd/devops-app
 
     # ---------------------------
-    # 2️⃣ BUILD DOCKER IMAGES ON VM
+    # 3️⃣ RESTART DOCKER ON VM
     # ---------------------------
     - name: Build & Restart Docker Containers
       run: |
-        ssh -o StrictHostKeyChecking=no sharvariguptessd@34.100.135.127 "
+        ssh -o StrictHostKeyChecking=no sharvariguptessd@35.222.138.153 "
           cd devops-app &&
           docker compose down &&
           docker compose up --build -d
         "
+
