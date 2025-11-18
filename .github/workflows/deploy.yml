@@ -1,0 +1,37 @@
+name: CI/CD Deployment
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    # ---------------------------
+    # 1️⃣ DEPLOY USING SSH
+    # ---------------------------
+    - name: Install SSH key
+      uses: webfactory/ssh-agent@v0.7.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Copy project files to VM
+      run: |
+        ssh -o StrictHostKeyChecking=no sharvariguptessd@34.100.135.127 "rm -rf devops-app"
+        scp -o StrictHostKeyChecking=no -r . sharvariguptessd@34.100.135.127:/home/sharvariguptessd/devops-app
+
+    # ---------------------------
+    # 2️⃣ BUILD DOCKER IMAGES ON VM
+    # ---------------------------
+    - name: Build & Restart Docker Containers
+      run: |
+        ssh -o StrictHostKeyChecking=no sharvariguptessd@34.100.135.127 "
+          cd devops-app &&
+          docker compose down &&
+          docker compose up --build -d
+        "
