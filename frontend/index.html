@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Recommender</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .container {
+            width: 380px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 18px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            font-size: 26px;
+        }
+
+        input {
+            width: 80%;
+            padding: 12px;
+            font-size: 15px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: #ffca28;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            width: 85%;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #ffd95e;
+            transform: translateY(-2px);
+        }
+
+        .results-box {
+            margin-top: 20px;
+            background: white;
+            color: black;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 15px;
+            display: none;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🛍️ Product Recommender</h2>
+
+    <input id="itemInput" placeholder="Enter product (shoes, laptop, phone)" />
+    <button onclick="getData()">Get Recommendations</button>
+
+    <div id="result" class="results-box"></div>
+</div>
+
+<script>
+    function getData() {
+        let item = document.getElementById("itemInput").value.trim();
+
+        if (!item) {
+            alert("Please enter a product!");
+            return;
+        }
+
+        fetch("http://35.222.138.153:5000/recommend?item=" + item)
+            .then(res => res.json())
+            .then(data => {
+                let recs = data.recommendations;
+
+                let formatted = "<strong>Recommended Products:</strong><br><ul>";
+                recs.forEach(r => {
+                    formatted += "<li>" + r + "</li>";
+                });
+                formatted += "</ul>";
+
+                let box = document.getElementById("result");
+                box.innerHTML = formatted;
+                box.style.display = "block";
+            })
+            .catch(err => {
+                let box = document.getElementById("result");
+                box.innerHTML = "⚠ Backend not reachable.";
+                box.style.display = "block";
+            });
+    }
+</script>
+
+</body>
+</html>
+
